@@ -1,11 +1,11 @@
 variable "atomic" {
-  description = "(Optional) If set, installation process purges chart on fail. The wait flag will be set automatically if atomic is used. Defaults to false"
+  description = "(Optional) If set, installation process purges chart on fail. The wait flag will be set automatically if atomic is used. Defaults to false."
   type        = bool
   default     = false
 }
 
 variable "name" {
-  description = "(Required) Release name"
+  description = "(Required) Release name."
   type        = string
   default     = null
 }
@@ -23,25 +23,25 @@ variable "chart_version" {
 }
 
 variable "repository" {
-  description = "Repository URL where to locate the requested chart."
+  description = "(Optional) Repository URL where to locate the requested chart."
   type        = string
   default     = null
 }
 
 variable "repository_key_file" {
-  description = "(Optional) The repositories cert key file"
+  description = "(Optional) The repositories cert key file."
   type        = string
   default     = null
 }
 
 variable "repository_cert_file" {
-  description = "(Optional) The repositories cert file"
+  description = "(Optional) The repositories cert file."
   type        = string
   default     = null
 }
 
 variable "repository_ca_file" {
-  description = "(Optional) The Repositories CA File."
+  description = "(Optional) The repositories CA file."
   type        = string
   default     = null
 }
@@ -56,6 +56,7 @@ variable "repository_password" {
   description = "(Optional) Password for HTTP basic authentication against the repository."
   type        = string
   default     = null
+  sensitive   = true
 }
 
 variable "devel" {
@@ -65,13 +66,13 @@ variable "devel" {
 }
 
 variable "verify" {
-  description = "(Optional) Verify the package before installing it. Helm uses a provenance file to verify the integrity of the chart; this must be hosted alongside the chart. For more information see the Helm Documentation. Defaults to false."
+  description = "(Optional) Verify the package before installing it. Helm uses a provenance file to verify the integrity of the chart; this must be hosted alongside the chart. Defaults to false."
   type        = bool
   default     = false
 }
 
 variable "keyring" {
-  description = "(Optional) Location of public keys used for verification. Used only if verify is true. Defaults to /.gnupg/pubring.gpg in the location set by home"
+  description = "(Optional) Location of public keys used for verification. Used only if verify is true. Defaults to /.gnupg/pubring.gpg in the location set by home."
   type        = string
   default     = null
 }
@@ -83,13 +84,13 @@ variable "timeout" {
 }
 
 variable "disable_webhooks" {
-  description = "(Optional) Prevent hooks from running. Defaults to false"
+  description = "(Optional) Prevent hooks from running. Defaults to false."
   type        = bool
   default     = false
 }
 
 variable "namespace" {
-  description = "(Required) The namespace to install the release into." # TF Resource defaults to default. we require a namespace to deploy to.
+  description = "(Required) The namespace to install the release into."
   type        = string
   default     = null
 }
@@ -101,7 +102,7 @@ variable "create_namespace" {
 }
 
 variable "reuse_values" {
-  description = "(Optional) When upgrading, reuse the last release's values and merge in any overrides. If 'reset_values' is specified, this is ignored. Defaults to false"
+  description = "(Optional) When upgrading, reuse the last release's values and merge in any overrides. If 'reset_values' is specified, this is ignored. Defaults to false."
   type        = bool
   default     = false
 }
@@ -114,26 +115,38 @@ variable "reset_values" {
 
 variable "values" {
   description = "(Optional) List of values in raw yaml to pass to helm. Values will be merged, in order, as Helm does with multiple -f options."
-  type        = list(any) # Can be ["${file("values.yaml")}"] or [<<EOF args: ["--myargument"] EOF]
-  default     = null
+  type        = list(any)
+  default     = []
 }
 
 variable "set" {
   description = "(Optional) Value block with custom values to be merged with the values yaml."
   type = list(object({
     name  = string
-    value = string
+    value = any
+    type  = optional(string)
   }))
-  default = null
+  default = []
+}
+
+variable "set_list" {
+  description = "(Optional) Value block with custom list values to be merged with the values yaml."
+  type = list(object({
+    name  = string
+    value = list(string)
+    type  = optional(string)
+  }))
+  default = []
 }
 
 variable "set_sensitive" {
   description = "(Optional) Value block with custom sensitive values to be merged with the values yaml that won't be exposed in the plan's diff."
   type = list(object({
-    path  = string
-    value = string
+    name  = string
+    value = any
+    type  = optional(string)
   }))
-  default = null
+  default = []
 }
 
 variable "dependency_update" {
@@ -143,31 +156,31 @@ variable "dependency_update" {
 }
 
 variable "force_update" {
-  description = "(Optional) Force resource update through delete/recreate if needed. Defaults to false"
+  description = "(Optional) Force resource update through delete/recreate if needed. Defaults to false."
   type        = bool
   default     = false
 }
 
 variable "recreate_pods" {
-  description = "(Optional) Perform pods restart during upgrade/rollback. Defaults to false"
+  description = "(Optional) Perform pods restart during upgrade/rollback. Defaults to false."
   type        = bool
   default     = false
 }
 
 variable "cleanup_on_fail" {
-  description = "(Optional) Allow deletion of new resources created in this upgrade when upgrade fails. Defaults to false"
+  description = "(Optional) Allow deletion of new resources created in this upgrade when upgrade fails. Defaults to false."
   type        = bool
   default     = false
 }
 
 variable "max_history" {
-  description = "Maximum number of release versions stored per release. Defaults to 0 (no limit)."
+  description = "(Optional) Maximum number of release versions stored per release. Defaults to 0 (no limit)."
   type        = number
   default     = 0
 }
 
 variable "skip_crds" {
-  description = "(Optional) If set, no CRDs will be installed. By default, CRDs are installed if not already present. Defaults to false"
+  description = "(Optional) If set, no CRDs will be installed. By default, CRDs are installed if not already present. Defaults to false."
   type        = bool
   default     = false
 }
@@ -185,7 +198,7 @@ variable "disable_openapi_validation" {
 }
 
 variable "replace" {
-  description = "(Optional) Re-use the given name, even if that name is already used. This is unsafe in production. Defaults to false"
+  description = "(Optional) Re-use the given name, even if that name is already used. This is unsafe in production. Defaults to false."
   type        = bool
   default     = false
 }
@@ -196,22 +209,26 @@ variable "description" {
   default     = null
 }
 
-variable "postrender" {
-  description = "(Optional) Configure a command to run after helm renders the manifest which can alter the manifest contents."
-  type = list(object({
-    binary_path = string
-  }))
-  default = null
-}
-
 variable "wait" {
-  description = "Will wait until all resources are in a ready state before marking the release as successful. It will wait for as long as timeout. Defaults to true"
+  description = "(Optional) Will wait until all resources are in a ready state before marking the release as successful. It will wait for as long as timeout. Defaults to true."
   type        = bool
   default     = true
 }
 
 variable "lint" {
-  description = "Run the helm chart linter during the plan. Defaults to true"
+  description = "(Optional) Run the helm chart linter during the plan. Defaults to true."
   type        = bool
   default     = true
+}
+
+variable "upgrade_install" {
+  description = "(Optional) If true, the provider will install the release at the specified version even if a release not controlled by the provider is present: this is equivalent to running 'helm upgrade --install' with the Helm CLI. Defaults to true."
+  type        = bool
+  default     = true
+}
+
+variable "take_ownership" {
+  description = "(Optional) If set, allows Helm to adopt existing resources not marked as managed by the release. Defaults to false."
+  type        = bool
+  default     = false
 }
